@@ -1,0 +1,95 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<UsingTask TaskName="UXDivers.Gorilla.Build.SetupSdkTask" AssemblyFile="UXDivers.Gorilla.Build.dll"/>
+	<UsingTask TaskName="UXDivers.Gorilla.Build.TeardownSdkTask" AssemblyFile="UXDivers.Gorilla.Build.dll"/>
+	<UsingTask TaskName="UXDivers.Gorilla.Build.DetectTask" AssemblyFile="UXDivers.Gorilla.Build.dll"/>
+
+	<PropertyGroup Condition=" $(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) ">
+    	<CompileDependsOn>
+      		$(CompileDependsOn);
+      		GorillaTeardown;
+    	</CompileDependsOn>
+  	</PropertyGroup>
+
+	<Target Name="DetectProject" BeforeTargets="GorillaAndroidDeps;GorillaiOSDeps" Condition=" $(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) ">  
+		<DetectTask SourceProject="$(MSBuildProjectFullPath)" FailOnError="$(GorillaFailOnError)">
+			<Output TaskParameter="IsAndroidProject" PropertyName="IsAndroidProject"/>
+			<Output TaskParameter="IsiOSProject" PropertyName="IsiOSProject"/>
+		</DetectTask>
+	</Target>  
+
+
+	<Target Name="GorillaCommonDeps" BeforeTargets="ResolveProjectReferences;ResolveAssemblyReferences;BeforeResolveReferences" Condition=" $(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) ">  
+		<Message Text="[Gorilla] Adding Common dependencies"></Message>
+
+	    <ItemGroup>
+	      <Reference Include="UXDivers.Gorilla.SDK.dll">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\UXDivers.Gorilla.SDK.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+
+	    <ItemGroup>
+	      <Reference Include="WebSocket4Net">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\WebSocket4Net.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+
+	    <ItemGroup>
+	      <Reference Include="EngineIoClientDotNet">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\EngineIoClientDotNet.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+
+	    <ItemGroup>
+	      <Reference Include="SocketIoClientDotNet">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\SocketIoClientDotNet.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+
+	    <ItemGroup>
+	      <Reference Include="SuperSocket.ClientEngine">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\SuperSocket.ClientEngine.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+	</Target>  
+
+	<Target Name="GorillaAndroidDeps" BeforeTargets="ResolveProjectReferences;ResolveAssemblyReferences;BeforeResolveReferences" Condition=" ($(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) and '$(IsAndroidProject)' == 'True') ">  
+		<Message Text="[Gorilla] Adding Android dependencies"></Message>
+
+	    <ItemGroup>
+	      <Reference Include="UXDivers.Gorilla.SDK.Droid.dll">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\UXDivers.Gorilla.SDK.Droid.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+	</Target>  
+
+	<Target Name="GorillaiOSDeps" BeforeTargets="ResolveProjectReferences;ResolveAssemblyReferences;BeforeResolveReferences" Condition=" ($(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) and '$(IsiOSProject)' == 'True') ">  
+		<Message Text="[Gorilla] Adding iOS dependencies"/>
+
+	    <ItemGroup>
+	      <Reference Include="UXDivers.Gorilla.SDK.iOS.dll">
+	        <HintPath>$(MSBuildThisFileDirectory)runtime\UXDivers.Gorilla.SDK.iOS.dll</HintPath>
+	        <Private>True</Private>
+	      </Reference>
+	    </ItemGroup>
+	</Target>  
+	  
+	<Target Name="GorillaSetup" AfterTargets="ResolveReferences" BeforeTargets="Compile" Condition=" $(DefineConstants.Contains('GORILLA')) and !$(DefineConstants.Contains('NO_GORILLA')) ">  
+	    <SetupSdkTask IntermediateOutputPath="$(IntermediateOutputPath)" SourceProject="$(MSBuildProjectFullPath)" FailOnError="$(GorillaFailOnError)" >
+	    	<Output TaskParameter="PartialFilePath" PropertyName="PartialFilePath"/>
+	    </SetupSdkTask>
+
+	    <ItemGroup>
+	      <Compile Include="$(PartialFilePath)" />
+	    </ItemGroup>
+	</Target>  
+
+	<Target Name="GorillaTeardown">  
+	    <TeardownSdkTask SourceProject="$(MSBuildProjectFullPath)" FailOnError="$(GorillaFailOnError)" />
+	</Target>  
+</Project>

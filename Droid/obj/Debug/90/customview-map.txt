@@ -1,0 +1,2 @@
+resources;C:\Users\mjavi\Gorilla\Player\Droid\obj\Debug\90\lp\4\jl\res\values\strings.xml
+string;C:\Users\mjavi\Gorilla\Player\Droid\obj\Debug\90\lp\4\jl\res\values\strings.xml
